@@ -75,7 +75,7 @@ curl -u <okta-email>:<artifactory-API-Key> https://artifacts.schibsted.io/artifa
 - Create a configuration for Storybook  
   - Run `mkdir .storybook && cd .storybook`
   - Create `index.js` and add the following
-  ```
+```
 import { configure } from '@kadira/storybook';
 
 const req = require.context('../packages/', true, /stories\/index.js$/)
@@ -89,7 +89,7 @@ configure(loadStories, module);
   This config will look for stories inside `/packages/stories/*`
 - Create a story inside any component repo, i.e.  
   - `/packages/<module>/stories/index.js`
-  ```
+```
 import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 
@@ -101,7 +101,7 @@ storiesOf('MyComponent', module)
     ));
 ```
 - Add script command to run Storybook
-  ```
+```
   "scripts" : {
     "storybook": "roc build --watch & start-storybook -p 9001 -c .storybook"
   }
