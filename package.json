@@ -5,11 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "roc"
+    "start": "roc",
+    "storybook": "roc build --watch & start-storybook -p 9001 -c .storybook"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@spp/roc-plugin-mono": "0.0.2"
+    "@kadira/storybook": "^2.35.3",
+    "@spp/roc-plugin-mono": "0.0.2",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
   }
 }
