@@ -66,9 +66,50 @@ curl -u <okta-email>:<artifactory-API-Key> https://artifacts.schibsted.io/artifa
 
 7. _Optional_. You can now verify your modules by issuing `roc list` (`npm start list`) in your project directory.
 
+## Storybook
+
+- Install the Storybook library  
+  Run `npm i --save-dev @kadira/storybook`
+- Install depepencies for Storybook  
+  Run `npm i --save-dev react react-dom`
+- Create a configuration for Storybook  
+  - Run `mkdir .storybook && cd .storybook`
+  - Create `index.js` and add the following  
+  ```
+import { configure } from '@kadira/storybook';
+
+const req = require.context('../packages/', true, /stories\/index.js$/)
+
+function loadStories() {
+    req.keys().forEach((filename) => req(filename))
+}
+
+configure(loadStories, module);
+```
+  This config will look for stories inside `/packages/stories/*`
+- Create a story inside any component repo, i.e.  
+  - `/packages/<module>/stories/index.js`
+  ```
+import React from 'react';
+import { storiesOf, action } from '@kadira/storybook';
+
+import MyComponent from '../src/index.js';
+
+storiesOf('MyComponent', module)
+    .add('default', () => (
+        <MyComponent/>
+    ));
+```
+- Add script command to run Storybook  
+```
+  "scripts" : {
+    "storybook": "roc build --watch & start-storybook -p 9001 -c .storybook"
+  }
+```,
+- Run `npm run storybook`
+- Go to http://localhost:9001/ in a web browser
 
 > TBD
 >
 > - npm link
 > - git init
-> - storybook
