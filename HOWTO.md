@@ -88,7 +88,7 @@ configure(loadStories, module);
 ```
   This config will look for stories inside `/packages/stories/*`
 - Create a story inside any component repo, i.e.  
-  - `/packages/<module>/stories/index.js`
+  - `/packages/<module>/stories/index.js`  
   ```
 import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
@@ -101,11 +101,11 @@ storiesOf('MyComponent', module)
     ));
 ```
 - Add script command to run Storybook  
-```
+  ```
   "scripts" : {
     "storybook": "roc build --watch & start-storybook -p 9001 -c .storybook"
   }
-```,
+```
 - Run `npm run storybook`
 - Go to http://localhost:9001/ in a web browser
 
