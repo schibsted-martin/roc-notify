@@ -1,5 +1,21 @@
 # roc-notify
 
+## Test
+
+Add a mapping between your own _Fuse_ user (stage) and a notification on `http://ab-web-notifications-stage.herokuapp.com/crm/usernotifications/userid` as _JSON_.
+```
+{
+  "users": [{
+    "notificationId": "<notification id>",
+    "userId": "<user id>"
+  }]
+}
+```
+
+A list of notifications can be found on `https://ab-web-notifications-stage.herokuapp.com/crm/notifications/all`
+
+You can check your user id on `http://stage.fuse.aftonbladet.se/v2/test/start`
+
 ## Contribute
 
 ### Prerequisites

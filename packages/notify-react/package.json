@@ -1,4 +1,7 @@
 {
-  "name": "notify-react",
-  "version": "0.0.0"
+  "name": "@spp/notify-react",
+  "version": "0.0.0",
+  "dependencies": {
+    "whatwg-fetch": "^2.0.3"
+  }
 }
