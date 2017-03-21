@@ -55,7 +55,7 @@ class Notify extends Component {
         const { last } = this.state;
 
         return (<div>
-            <h3>Notify</h3>
+            <h3>Notify!</h3>
             <p>{ last }</p>
         </div>);
     }
