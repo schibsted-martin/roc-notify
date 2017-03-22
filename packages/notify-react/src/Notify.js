@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import 'whatwg-fetch';
 
@@ -24,7 +24,7 @@ class Notify extends Component {
             bid: '',
         });
 
-        this.state = { last: 'init' };
+        this.state = { status: 'initialized' };
     }
 
     fetchNotifications({ exclude, userInfo, sid, segment, bid }) {
@@ -47,33 +47,61 @@ class Notify extends Component {
             throw new Error('ERR');
         })
         .then(json => {
-            this.setState({ last: 'success', data: { ...json.stickyBottom } });
+            const { logoUrl: image, headline: title, textMessage: text, actionUrl: url, actionText } = json.stickyBottom;
+
+            this.setState({
+                status: 'fetched',
+                data: {
+                    image,
+                    title,
+                    text,
+                    link: {
+                        url,
+                        title: actionText,
+                    },
+                },
+            });
             console.log(json);
         })
         .catch(error => console.log(error));
     }
 
     render() {
-        const { last } = this.state;
+        const { theme } = this.props;
+        const { status } = this.state;
 
-        if (last === 'success') {
+        if (status === 'fetched') {
             const { data } = this.state;
 
             return (
-                <div>
-                    <img src={ data.logoUrl }/>
-                    <h3>{ data.headline }</h3>
-                    <p>{ data.textMessage }</p>
-                    <a href={ data.actionUrl }>{ data.actionText }</a>
+                <div className={ theme.container }>
+                    <img src={ data.image } className={ theme.image }/>
+                    <h3 className={ theme.title }>{ data.title }</h3>
+                    <p className={ theme.text }>{ data.text }</p>
+                    <a href={ data.link.url } className={ theme.link }>{ data.link.title }</a>
                 </div>
             );
         }
 
         return (<a href="">
             <h3>Notify</h3>
-            <p>{ last }</p>
+            <p>{ status }</p>
         </a>);
     }
 }
+
+Notify.propTypes = {
+    theme: PropTypes.shape({
+        container: PropTypes.string,
+        image: PropTypes.string,
+        title: PropTypes.string,
+        text: PropTypes.string,
+        link: PropTypes.string,
+    })
+};
+
+Notify.defaultProps = {
+    theme: {},
+};
 
 export default Notify;
