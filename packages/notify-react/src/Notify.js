@@ -12,6 +12,41 @@ const paramify = (params, encoder = encodeURIComponent) => {
         : '';
 };
 
+const transformNotifications = (json) => {
+    const { logoUrl: image, headline: title, textMessage: text, actionUrl: url, actionText } = json.stickyBottom;
+
+    return {
+        image,
+        title,
+        text,
+        link: {
+            url,
+            title: actionText,
+        },
+    };
+};
+
+const fetchNotifications = ({ exclude, userInfo, sid, segment, bid }) => {
+    return fetch(
+        `https://crossorigin.me/https://ab-web-notifications-stage.herokuapp.com/crm/notifications${paramify({
+            exclude,
+            userInfo,
+            sid,
+            segment,
+            bid,
+        }, (value) => value)}`,
+        {
+            method: 'GET',
+        }
+    )
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('ERR');
+    })
+};
+
 class Notify extends Component {
     constructor(props) {
         super(props);
@@ -27,38 +62,13 @@ class Notify extends Component {
         this.state = { status: 'initialized' };
     }
 
-    fetchNotifications({ exclude, userInfo, sid, segment, bid }) {
-        fetch(
-            `https://crossorigin.me/https://ab-web-notifications-stage.herokuapp.com/crm/notifications${paramify({
-                exclude,
-                userInfo,
-                sid,
-                segment,
-                bid,
-            }, (value) => value)}`,
-            {
-                method: 'GET',
-            }
-        )
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('ERR');
-        })
+    fetchNotifications(args) {
+        fetchNotifications(args)
         .then(json => {
-            const { logoUrl: image, headline: title, textMessage: text, actionUrl: url, actionText } = json.stickyBottom;
-
             this.setState({
                 status: 'fetched',
                 data: {
-                    image,
-                    title,
-                    text,
-                    link: {
-                        url,
-                        title: actionText,
-                    },
+                    ...transformNotifications(json)
                 },
             });
             console.log(json);
