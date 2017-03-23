@@ -82,14 +82,14 @@ class Notify extends Component {
         .catch(error => console.log(error));
     }
 
-    handleClick() {
-        this.onClick && this.onClick();
+    handleClick = (e) => {
+        this.props.onClick && this.props.onClick(e, this.state);
     }
 
-    handleClose(e) {
+    handleClose = (e) => {
         e.preventDefault()
 
-        this.onClose && this.onClose();
+        this.props.onClose && this.props.onClose(e, this.state);
     }
 
     render() {
