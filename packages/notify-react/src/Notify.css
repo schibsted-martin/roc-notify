@@ -1,0 +1,47 @@
+.root {
+    position: fixed;
+    background: rgba(0, 0, 0, .2);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.container {
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+}
+
+.text {
+    flex-direction: column;
+}
+
+.title {
+    color: red;
+}
+
+.close {
+    position: absolute;
+    right: 0;
+    visibility: hidden;
+    height: 16px;
+    width: 16px;
+}
+
+.close:before {
+    box-sizing: border-box;
+    display: flex;
+    visibility: visible;
+    height: 16px;
+    width: 16px;
+    overflow: hidden;
+    content: 'X';
+    border: 1px solid red; 
+}
