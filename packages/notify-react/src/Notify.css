@@ -1,4 +1,16 @@
-.root {
+.text {
+    margin: 0 16px;
+    font-family: arial;
+}
+
+.inline {
+    composes: text;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.popup {
     position: fixed;
     top: 0;
     left: 0;
@@ -53,11 +65,10 @@
     margin: 16px 0;
 }
 
-.text {
-    flex-direction: column;
-    margin: 0 16px;
+.message {
+    composes: text;
 
-    font-family: arial;
+    flex-direction: column;
 }
 
 .title {
@@ -65,7 +76,7 @@
     margin-bottom: 0;
 }
 
-.message {
+.paragraph {
     margin-top: 0;
 }
 

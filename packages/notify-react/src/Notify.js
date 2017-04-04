@@ -1,10 +1,20 @@
 import React, { Component, PropTypes } from 'react';
-
 import 'whatwg-fetch';
+import localStorage from '@aftonbladet/local-storage';
+
+const resolve = (param) => {
+    if ('function' === typeof param) return param();
+
+    return param;
+}
 
 const paramify = (params, encoder = encodeURIComponent) => {
     const query = Object.keys(params)
-        .map(key => `${encoder(key)}=${encoder(params[key])}`)
+        .map(key => {
+            return Array.isArray(params[key]) && params[key].length
+                ? params[key].map(value => `${encoder(key)}=${encoder(value)}`).join('&')
+                : `${encoder(key)}=${encoder(params[key])}`;
+        })
         .join('&');
 
     return query.length > 0
@@ -14,12 +24,13 @@ const paramify = (params, encoder = encodeURIComponent) => {
 
 const transformNotification = (type, json) => {
     if (json[type]) {
-        const { logoUrl: image, headline: title, textMessage: message, actionUrl: url, actionText } = json[type];
+        const { id, logoUrl: image, headline: title, textMessage: paragraph, actionUrl: url, actionText } = json[type];
 
         return {
+            id,
             image,
             title,
-            message,
+            paragraph,
             link: {
                 url,
                 title: actionText,
@@ -30,15 +41,9 @@ const transformNotification = (type, json) => {
     return {};
 };
 
-const fetchNotification = ({ exclude, userInfo, sid, segment, bid }) => {
+const fetchNotification = ({ exclude, user: userInfo, siteCatalystId: sid, burtId: bid, testSegment: segment }) => {
     return fetch(
-        `https://crossorigin.me/https://ab-web-notifications-stage.herokuapp.com/crm/notifications${paramify({
-            exclude,
-            userInfo,
-            sid,
-            segment,
-            bid,
-        }, (value) => value)}`,
+        `https://crossorigin.me/https://ab-web-notifications-stage.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, (value) => value)}`,
         {
             method: 'GET',
         }
@@ -47,9 +52,21 @@ const fetchNotification = ({ exclude, userInfo, sid, segment, bid }) => {
         if (response.ok) {
             return response.json();
         }
-        throw new Error('ERR');
+        throw new Error('Failed to load resource');
     })
 };
+
+const persistClosedNotifications = (id) => {
+    if (id) {
+        const excluded = localStorage.readValue('notify-exclude') || [];
+
+        if (!excluded.includes(id)) excluded.push(id);
+
+        localStorage.persistValue('notify-exclude', excluded);
+    }
+};
+
+const getPersistedClosedNotifications = () => localStorage.readValue('notify-exclude', 10 /*(1000 * 60 * 60 * 24)*/) || [];// Uncomment when done.
 
 class Notify extends Component {
     constructor(props) {
@@ -61,35 +78,46 @@ class Notify extends Component {
     }
 
     fetchNotification() {
-        const { type } = this.props;
+        const { type, user, siteCatalystId, burtId, testSegment } = this.props;
 
         fetchNotification({
-            exclude: [],
-            userInfo: 'MCwCFBzGXH2LC3yDGsLzKuaEJwDzYv4zAhRNbImxLIz2rFP/7olYy2n1hKKtwQ==.eyJ1c2VySWQiOjExMTAwMDM1LCJuYW1lIjoibWFydGluX2RhbmllbHNzb24iLCJzZXJ2aWNlcyI6W10sInRpbWUiOjE0ODg4ODg1ODB9',
-            sid: '2B9398068530B4E6-40000301A00912B5',
-            segment: 17,
-            bid: '',
+            exclude: getPersistedClosedNotifications().map(encodeURIComponent),
+            user: resolve(user),
+            siteCatalystId: resolve(siteCatalystId),
+            burtId: resolve(burtId),
+            testSegment: resolve(testSegment),
         })
         .then(json => {
             this.setState({
-                status: 'fetched',
+                status: json[type] ? 'fetched' : 'empty',
                 data: {
                     ...transformNotification(type, json)
                 },
             });
-            console.log(json);
         })
         .catch(error => console.log(error));
     }
 
     handleClick = (e) => {
         this.props.onClick && this.props.onClick(e, this.state);
+
+        persistClosedNotifications(this.state.data && this.state.data.id);
+
+        this.setState({
+            status: 'clicked',
+        })
     }
 
     handleClose = (e) => {
         e.preventDefault()
 
         this.props.onClose && this.props.onClose(e, this.state);
+
+        persistClosedNotifications(this.state.data && this.state.data.id);
+
+        this.setState({
+            status: 'closed',
+        })
     }
 
     render() {
@@ -98,15 +126,21 @@ class Notify extends Component {
 
         if (status === 'fetched') {
             if (['fishStick', 'fishStickClosable'].includes(type)) {
-                return <div>IQ fiskpinne</div>;
+                // teaser?
+                return (
+                    <a href={ data.link.url } onClick={ this.handleClick } className={ theme.inline }>
+                        <h3 className={ theme.title }>{ data.title }</h3>
+                        <p className={ theme.paragraph }>{ data.paragraph }</p>
+                    </a>
+                );
             } else {
                 return (
-                    <div className={ theme.root }>
+                    <div className={ theme.popup }>
                         <div className={ theme.container }>
                             <img src={ data.image } className={ theme.image }/>
-                            <span className={ theme.text }>
+                            <span className={ theme.message }>
                                 <h3 className={ theme.title }>{ data.title }</h3>
-                                <p className={ theme.message }>{ data.message }</p>
+                                <p className={ theme.paragraph }>{ data.paragraph }</p>
                             </span>
                             <a href={ data.link.url } onClick={ this.handleClick } className={ theme.link }>{ data.link.title }</a>
                             <a href="#" onClick={ this.handleClose } className={ theme.close }>Close</a>
@@ -117,10 +151,9 @@ class Notify extends Component {
         }
 
         return (
-            <div className={ theme.root }>
-                <h3>Notify</h3>
-                <p>{ status }</p>
-            </div>
+            <pre>
+                Notify status: { status }
+            </pre>
         );
     }
 }
@@ -128,7 +161,9 @@ class Notify extends Component {
 Notify.propTypes = {
     type: PropTypes.oneOf(['stickyBottom', 'fishStick', 'fishStickClosable']),
     theme: PropTypes.shape({
-        root: PropTypes.string,
+        font: PropTypes.string,
+        inline: PropTypes.string,
+        popup: PropTypes.string,
         container: PropTypes.string,
         image: PropTypes.string,
         text: PropTypes.string,
@@ -136,7 +171,11 @@ Notify.propTypes = {
         message: PropTypes.string,
         link: PropTypes.string,
         close: PropTypes.string,
-    }),
+    }).isRequired,
+    user: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
+    siteCatalystId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    burtId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    testSegment: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
     onClick: PropTypes.func,
     onClose: PropTypes.func,
 };
@@ -144,6 +183,10 @@ Notify.propTypes = {
 Notify.defaultProps = {
     type: 'stickyBottom',
     theme: {},
+    user: '',
+    siteCatalystId: '',
+    burtId: '',
+    testSegment: '',
 };
 
 export default Notify;

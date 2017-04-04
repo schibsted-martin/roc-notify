@@ -2,6 +2,7 @@
   "name": "@spp/notify-react",
   "version": "0.0.0",
   "dependencies": {
+    "@aftonbladet/local-storage": "^0.1.0",
     "whatwg-fetch": "^2.0.3"
   }
 }

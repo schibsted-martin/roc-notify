@@ -4,6 +4,8 @@ import { storiesOf, action } from '@kadira/storybook';
 import Notify from '../src/index.js';
 import theme from '../src/Notify.css';
 
+const testUser = 'MCwCFBzGXH2LC3yDGsLzKuaEJwDzYv4zAhRNbImxLIz2rFP/7olYy2n1hKKtwQ==.eyJ1c2VySWQiOjExMTAwMDM1LCJuYW1lIjoibWFydGluX2RhbmllbHNzb24iLCJzZXJ2aWNlcyI6W10sInRpbWUiOjE0ODg4ODg1ODB9';
+
 const customAction = (e, state) => {
     e.preventDefault();
 
@@ -14,15 +16,15 @@ const customAction = (e, state) => {
 
 storiesOf('Notify', module)
     .add('default', () => (
-        <Notify/>
+        <Notify user={ testUser }/>
     ))
     .add('with default theme', () => (
-        <Notify theme={ theme }/>
+        <Notify user={ testUser } theme={ theme }/>
     ))
     .add('of type "fiskpinne" (themed)', () => (
-        <Notify type="fishStick" theme={ theme }/>
+        <Notify user={ testUser } type="fishStick" theme={ theme }/>
     ))
     .add('with custom actions', () => (
-        <Notify theme={ theme } onClick={ customAction } onClose={ action('Closed notification') }/>
+        <Notify user={ testUser } theme={ theme } onClick={ customAction } onClose={ action('Closed notification') }/>
     ))
 ;
