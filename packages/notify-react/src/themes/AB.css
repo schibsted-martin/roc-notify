@@ -1,0 +1,161 @@
+.text {
+    font-family: Arial, Helvetica, Verdana, Geneva, sans-serif;
+    font-size: 93.75%;
+}
+
+@media (max-width: 480px) {
+    .text {
+        font-size: 13px;
+    }
+}
+
+.inline {
+    composes: text;
+
+    display: flex;
+    flex-direction: column;
+
+    margin: 0 15px;
+}
+
+.container {
+    composes: text;
+
+    box-sizing: border-box;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    padding: 0 5px;
+    min-height: 108px;
+    background: hsla(0, 0%, 98%, .95);
+    border-top: rgba(0, 0, 0, .09);
+    box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, .1);
+    animation: abNotifyslideIn ease-out .3s forwards;
+    animation-iteration-count: 1;
+}
+
+@keyframes abNotifyslideIn {
+    0% {
+        margin-bottom: -108px;
+    }
+    100% {
+        margin-bottom: 0;
+    }
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    visibility: hidden;
+    order: 4;
+
+    height: 16px;
+    width: 16px;
+    text-decoration: none;
+    color: gray;
+}
+
+.close:before {
+    box-sizing: border-box;
+    visibility: visible;
+    height: 16px;
+    width: 16px;
+
+    display: flex;
+    overflow: hidden;
+    content: '\D7';
+    font-size: 28px;
+    line-height: 17px;
+}
+
+.image {
+    order: 1;
+
+    max-width: 50px;
+    margin: 15px 15px 15px 0;
+}
+
+@media (max-width: 320px) {
+    .image {
+        display: none;
+    }
+}
+
+.message {
+    composes: text;
+
+    flex-direction: column;
+    order: 2;
+
+    margin: 0 15px 0 0;
+}
+
+.title {
+    font-weight: bold;
+    margin-bottom: 0;
+
+    font-size: 14px;
+    line-height: 1.07;
+}
+
+@media (min-width: 1024px) {
+    .title {
+        font-size: 16px;
+    }
+}
+
+.paragraph {
+    margin-top: 4px;
+}
+
+.link {
+    order: 3;
+
+    text-decoration: none;
+    text-align: center;
+
+    border-radius: 2px;
+    border: 1px solid rgba(34, 34, 34, 0.1);
+    background: #FFEB18;
+    color: #000;
+    font-weight: 700;
+    min-width: 77px;
+    padding: 10px 9px;
+}
+
+@media (max-width: 480px) {
+    .link {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 480px) {
+    .link {
+        padding: 9pt 13px 13px;
+        min-width: 177px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .close {
+        position: static;
+        padding: 1em;
+        order: 1;
+    }
+    .image {
+        order: 2;
+    }
+    .message {
+        order: 3;
+    }
+    .link {
+        order: 4;
+    }
+}

@@ -41,9 +41,9 @@ const transformNotification = (type, json) => {
     return {};
 };
 
-const fetchNotification = ({ exclude, user: userInfo, siteCatalystId: sid, burtId: bid, testSegment: segment }) => {
+const fetchNotification = ({ exclude, user: userInfo, siteCatalystId: sid, burtId: bid, testSegment: segment, environment }) => {
     return fetch(
-        `https://crossorigin.me/https://ab-web-notifications-stage.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, (value) => value)}`,
+        `https://crossorigin.me/https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, (value) => value)}`,
         {
             method: 'GET',
         }
@@ -78,7 +78,7 @@ class Notify extends Component {
     }
 
     fetchNotification() {
-        const { type, user, siteCatalystId, burtId, testSegment } = this.props;
+        const { type, user, siteCatalystId, burtId, testSegment, environment } = this.props;
 
         fetchNotification({
             exclude: getPersistedClosedNotifications().map(encodeURIComponent),
@@ -86,6 +86,7 @@ class Notify extends Component {
             siteCatalystId: resolve(siteCatalystId),
             burtId: resolve(burtId),
             testSegment: resolve(testSegment),
+            environment,
         })
         .then(json => {
             this.setState({
@@ -178,6 +179,7 @@ Notify.propTypes = {
     testSegment: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
     onClick: PropTypes.func,
     onClose: PropTypes.func,
+    environment: PropTypes.oneOf(['production', 'stage']),
 };
 
 Notify.defaultProps = {
@@ -187,6 +189,7 @@ Notify.defaultProps = {
     siteCatalystId: '',
     burtId: '',
     testSegment: '',
+    environment: 'production',
 };
 
 export default Notify;
