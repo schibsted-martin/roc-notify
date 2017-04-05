@@ -109,6 +109,31 @@ storiesOf('MyComponent', module)
 - Run `npm run storybook`
 - Go to http://localhost:9001/ in a web browser
 
+### Publish Storybook to GitHub Pages
+
+- Create a branch called `gh-pages` and use it as the default branch for your _GitHub Pages_ (_Settings_)
+- Add a script command to build a static version of the Storybook
+```
+  "scripts" : {
+    "build:storybook": "build-storybook -c .storybook -o .out",
+  }
+```
+- Add a line to your `.gitignore` file to exclude the output
+```
+# Storybook
+.out
+```
+- Install `gh-pages` to be able to push to the branch a little easier
+  Run `npm i --save-dev gh-pages`
+- Add a script to build and publish the output to _ GitHub Pages_
+```
+  "scripts" : {
+    "docs:publish": "npm run build:storybook && gh-pages -d .out"
+  }
+```
+- Publish the Storybook and verify the site
+  Run `npm run docs:publish`
+
 > TBD
 >
 > - npm link
