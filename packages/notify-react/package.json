@@ -3,9 +3,15 @@
   "version": "0.0.1",
   "main": "lib/cjs/index.js",
   "modules": "lib/esm/index.js",
+  "files": [
+    "lib"
+  ],
   "dependencies": {
     "@aftonbladet/local-storage": "^0.1.0",
     "exenv": "^1.2.1",
     "whatwg-fetch": "^2.0.3"
+  },
+  "peerDependencies": {
+    "react-css-themr": "^2.0.0"
   }
 }
