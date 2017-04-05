@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
+import { canUseDOM } from 'exenv';
 import 'whatwg-fetch';
-import localStorage from '@aftonbladet/local-storage';
+
+const localStorage = canUseDOM ? require('@aftonbladet/local-storage') : {};
 
 const resolve = (param) => {
     if ('function' === typeof param) return param();
@@ -58,15 +60,23 @@ const fetchNotification = ({ exclude, user: userInfo, siteCatalystId: sid, burtI
 
 const persistClosedNotifications = (id) => {
     if (id) {
-        const excluded = localStorage.readValue('notify-exclude') || [];
+        if (canUseDOM) {
+            const excluded = localStorage.readValue('notify-exclude') || [];
 
-        if (!excluded.includes(id)) excluded.push(id);
+            if (!excluded.includes(id)) excluded.push(id);
 
-        localStorage.persistValue('notify-exclude', excluded);
+            localStorage.persistValue('notify-exclude', excluded);
+        }
     }
 };
 
-const getPersistedClosedNotifications = () => localStorage.readValue('notify-exclude', 10 /*(1000 * 60 * 60 * 24)*/) || [];// Uncomment when done.
+const getPersistedClosedNotifications = () => {
+    if (canUseDOM) {
+        localStorage.readValue('notify-exclude', 10 /*(1000 * 60 * 60 * 24)*/) || [];// Uncomment when done.
+    }
+
+    return [];
+};
 
 class Notify extends Component {
     constructor(props) {

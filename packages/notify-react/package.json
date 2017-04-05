@@ -1,8 +1,11 @@
 {
   "name": "@spp/notify-react",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "main": "lib/cjs/index.js",
+  "modules": "lib/esm/index.js",
   "dependencies": {
     "@aftonbladet/local-storage": "^0.1.0",
+    "exenv": "^1.2.1",
     "whatwg-fetch": "^2.0.3"
   }
 }
