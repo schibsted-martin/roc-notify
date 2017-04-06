@@ -1,5 +1,5 @@
 {
-  "name": "@spp/notify-react",
+  "name": "@aftonbladet/notify-react",
   "version": "0.1.0",
   "main": "lib/cjs/index.js",
   "modules": "lib/esm/index.js",
