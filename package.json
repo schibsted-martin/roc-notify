@@ -11,7 +11,7 @@
     "build:storybook": "build-storybook -c .storybook -o .out",
     "docs:publish": "npm run build:storybook && gh-pages -d .out"
   },
-  "author": "",
+  "author": "lol",
   "license": "ISC",
   "devDependencies": {
     "@kadira/storybook": "^2.35.3",
