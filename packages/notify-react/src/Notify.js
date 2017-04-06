@@ -5,18 +5,16 @@ import 'whatwg-fetch';
 const localStorage = canUseDOM ? require('@aftonbladet/local-storage') : {};
 
 const resolve = (param) => {
-    if ('function' === typeof param) return param();
+    if (typeof param === 'function') return param();
 
     return param;
-}
+};
 
 const paramify = (params, encoder = encodeURIComponent) => {
     const query = Object.keys(params)
-        .map(key => {
-            return Array.isArray(params[key]) && params[key].length
-                ? params[key].map(value => `${encoder(key)}=${encoder(value)}`).join('&')
-                : `${encoder(key)}=${encoder(params[key])}`;
-        })
+        .map(key => (Array.isArray(params[key]) && params[key].length
+            ? params[key].map(value => `${encoder(key)}=${encoder(value)}`).join('&')
+            : `${encoder(key)}=${encoder(params[key])}`))
         .join('&');
 
     return query.length > 0
@@ -26,7 +24,14 @@ const paramify = (params, encoder = encodeURIComponent) => {
 
 const transformNotification = (type, json) => {
     if (json[type]) {
-        const { id, logoUrl: image, headline: title, textMessage: paragraph, actionUrl: url, actionText } = json[type];
+        const {
+            id,
+            logoUrl: image,
+            headline: title,
+            textMessage: paragraph,
+            actionUrl: url,
+            actionText,
+        } = json[type];
 
         return {
             id,
@@ -43,20 +48,25 @@ const transformNotification = (type, json) => {
     return {};
 };
 
-const fetchNotification = ({ exclude, user: userInfo, siteCatalystId: sid, burtId: bid, testSegment: segment, environment }) => {
-    return fetch(
-        `${canUseDOM ? 'https://crossorigin.me/' : ''}https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, (value) => value)}`,
-        {
-            method: 'GET',
-        }
-    )
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error('Failed to load resource');
-    })
-};
+const fetchNotification = ({
+    exclude,
+    user: userInfo,
+    siteCatalystId: sid,
+    burtId: bid,
+    testSegment: segment,
+    environment,
+}) => fetch( // eslint-disable-line no-undef
+    `${canUseDOM ? 'https://crossorigin.me/' : ''}https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, value => value)}`,
+    {
+        method: 'GET',
+    }
+)
+.then((response) => {
+    if (response.ok) {
+        return response.json();
+    }
+    throw new Error('Failed to load resource');
+});
 
 const persistClosedNotifications = (id) => {
     if (id) {
@@ -72,7 +82,7 @@ const persistClosedNotifications = (id) => {
 
 const getPersistedClosedNotifications = () => {
     if (canUseDOM) {
-        localStorage.readValue('notify-exclude', (1000 * 60 * 60 * 24)) || [];
+        return localStorage.readValue('notify-exclude', 1000 * 60 * 60 * 24) || [];
     }
 
     return [];
@@ -100,11 +110,11 @@ class Notify extends Component {
             testSegment: resolve(testSegment),
             environment,
         })
-        .then(json => {
+        .then((json) => {
             this.setState({
                 status: json[type] ? 'fetched' : 'empty',
                 data: {
-                    ...transformNotification(type, json)
+                    ...transformNotification(type, json),
                 },
             });
         })
@@ -112,25 +122,25 @@ class Notify extends Component {
     }
 
     handleClick = (e) => {
-        this.props.onClick && this.props.onClick(e, this.state);
+        if (this.props.onClick) this.props.onClick(e, this.state);
 
         persistClosedNotifications(this.state.data && this.state.data.id);
 
         this.setState({
             status: 'clicked',
-        })
+        });
     }
 
     handleClose = (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        this.props.onClose && this.props.onClose(e, this.state);
+        if (this.props.onClose) this.props.onClose(e, this.state);
 
         persistClosedNotifications(this.state.data && this.state.data.id);
 
         this.setState({
             status: 'closed',
-        })
+        });
     }
 
     render() {
@@ -138,29 +148,35 @@ class Notify extends Component {
         const { status, data } = this.state;
 
         if (status === 'fetched') {
+            const { link, title, paragraph, image } = data;
+
             if (['fishStick', 'fishStickClosable'].includes(type)) {
                 // teaser?
                 return (
-                    <a href={ data.link.url } onClick={ this.handleClick } className={ theme.inline }>
-                        <h3 className={ theme.title }>{ data.title }</h3>
-                        <p className={ theme.paragraph }>{ data.paragraph }</p>
+                    <a href={link.url} onClick={this.handleClick} className={theme.inline}>
+                        <h3 className={theme.title}>{title}</h3>
+                        <p className={theme.paragraph}>{paragraph}</p>
                     </a>
                 );
-            } else {
-                return (
-                    <div className={ theme.popup }>
-                        <div className={ theme.container }>
-                            <img src={ data.image } className={ theme.image }/>
-                            <span className={ theme.message }>
-                                <h3 className={ theme.title }>{ data.title }</h3>
-                                <p className={ theme.paragraph }>{ data.paragraph }</p>
-                            </span>
-                            <a href={ data.link.url } onClick={ this.handleClick } className={ theme.link }>{ data.link.title }</a>
-                            <a href="#" onClick={ this.handleClose } className={ theme.close }>Close</a>
-                        </div>
-                    </div>
-                );
             }
+
+            return (
+                <div className={theme.popup}>
+                    <div className={theme.container}>
+                        <img alt="" src={image} className={theme.image} />
+                        <span className={theme.message}>
+                            <h3 className={theme.title}>{title}</h3>
+                            <p className={theme.paragraph}>{paragraph}</p>
+                        </span>
+                        <a href={link.url} onClick={this.handleClick} className={theme.link}>
+                            {link.title}
+                        </a>
+                        <button href="#" onClick={this.handleClose} className={theme.close}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            );
         }
 
         return null;
@@ -197,6 +213,8 @@ Notify.defaultProps = {
     siteCatalystId: '',
     burtId: '',
     testSegment: '',
+    onClick: undefined,
+    onClose: undefined,
     environment: 'production',
 };
 
