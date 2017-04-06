@@ -72,7 +72,7 @@ const persistClosedNotifications = (id) => {
 
 const getPersistedClosedNotifications = () => {
     if (canUseDOM) {
-        localStorage.readValue('notify-exclude', 10 /*(1000 * 60 * 60 * 24)*/) || [];// Uncomment when done.
+        localStorage.readValue('notify-exclude', (1000 * 60 * 60 * 24)) || [];
     }
 
     return [];
