@@ -2,8 +2,7 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 
 import Notify from '../src/index.js';
-// import theme from '../src/Notify.css';
-import theme from '../src/themes/AB.css';
+import theme from '../themes/default.css';
 
 const users = {
     martin: {

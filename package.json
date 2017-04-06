@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "roc",
-    "storybook": "roc build --watch & start-storybook -p 9001 -c .storybook",
+    "storybook": "npm run build && start-storybook -p 9001 -c .storybook",
+    "build": "roc build --watch",
     "build:storybook": "build-storybook -c .storybook -o .out",
     "docs:publish": "npm run build:storybook && gh-pages -d .out"
   },

@@ -45,7 +45,7 @@ const transformNotification = (type, json) => {
 
 const fetchNotification = ({ exclude, user: userInfo, siteCatalystId: sid, burtId: bid, testSegment: segment, environment }) => {
     return fetch(
-        `https://crossorigin.me/https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, (value) => value)}`,
+        `${canUseDOM ? 'https://crossorigin.me/' : ''}https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, (value) => value)}`,
         {
             method: 'GET',
         }
@@ -82,9 +82,11 @@ class Notify extends Component {
     constructor(props) {
         super(props);
 
-        this.fetchNotification();
-
         this.state = { status: 'initialized' };
+    }
+
+    componentDidMount() {
+        this.fetchNotification();
     }
 
     fetchNotification() {
@@ -161,11 +163,7 @@ class Notify extends Component {
             }
         }
 
-        return (
-            <pre>
-                Notify status: { status }
-            </pre>
-        );
+        return null;
     }
 }
 

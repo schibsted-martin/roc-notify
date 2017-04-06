@@ -4,7 +4,8 @@
   "main": "lib/cjs/index.js",
   "modules": "lib/esm/index.js",
   "files": [
-    "lib"
+    "lib",
+    "themes"
   ],
   "dependencies": {
     "@aftonbladet/local-storage": "^0.1.0",
