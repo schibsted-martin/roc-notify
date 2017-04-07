@@ -30,7 +30,7 @@ storiesOf('Notify', module)
         <Notify user={ testUser } environment={ environment } theme={ theme }/>
     ))
     .add('of type "fiskpinne" (themed)', () => (
-        <Notify user={ testUser } environment={ environment } type="fishStick" theme={ theme }/>
+        <Notify user={ testUser } environment={ environment } type="inline" theme={ theme }/>
     ))
     .add('with custom actions', () => (
         <Notify user={ testUser } environment={ environment } theme={ theme } onClick={ customAction } onClose={ action('Closed notification') }/>

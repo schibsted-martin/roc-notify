@@ -22,8 +22,8 @@ const paramify = (params, encoder = encodeURIComponent) => {
         : '';
 };
 
-const transformNotification = (type, json) => {
-    if (json[type]) {
+const transformNotification = (data) => {
+    if (data) {
         const {
             id,
             logoUrl: image,
@@ -31,7 +31,8 @@ const transformNotification = (type, json) => {
             textMessage: paragraph,
             actionUrl: url,
             actionText,
-        } = json[type];
+            theme,
+        } = data;
 
         return {
             id,
@@ -42,6 +43,7 @@ const transformNotification = (type, json) => {
                 url,
                 title: actionText,
             },
+            variant: theme,
         };
     }
 
@@ -111,10 +113,17 @@ class Notify extends Component {
             environment,
         })
         .then((json) => {
+            let data;
+            if (type === 'popup') {
+                data = json.stickyBottom;
+            } else if (type === 'inline') {
+                data = json.fishStick || json.fishStickClosable;
+            }
+
             this.setState({
-                status: json[type] ? 'fetched' : 'empty',
+                status: data ? 'fetched' : 'empty',
                 data: {
-                    ...transformNotification(type, json),
+                    ...transformNotification(data),
                 },
             });
         })
@@ -148,12 +157,12 @@ class Notify extends Component {
         const { status, data } = this.state;
 
         if (status === 'fetched') {
-            const { link, title, paragraph, image } = data;
+            const { link, title, paragraph, image, variant } = data;
 
-            if (['fishStick', 'fishStickClosable'].includes(type)) {
+            if (type === 'inline') {
                 // teaser?
                 return (
-                    <a href={link.url} onClick={this.handleClick} className={theme.inline}>
+                    <a href={link.url} onClick={this.handleClick} className={[theme.inline, theme[`inline--${variant}`]].join(' ')}>
                         <h3 className={theme.title}>{title}</h3>
                         <p className={theme.paragraph}>{paragraph}</p>
                     </a>
@@ -184,7 +193,7 @@ class Notify extends Component {
 }
 
 Notify.propTypes = {
-    type: PropTypes.oneOf(['stickyBottom', 'fishStick', 'fishStickClosable']),
+    type: PropTypes.oneOf(['popup', 'inline']),
     theme: PropTypes.shape({
         font: PropTypes.string,
         inline: PropTypes.string,
@@ -207,7 +216,7 @@ Notify.propTypes = {
 };
 
 Notify.defaultProps = {
-    type: 'stickyBottom',
+    type: 'popup',
     theme: {},
     user: '',
     siteCatalystId: '',

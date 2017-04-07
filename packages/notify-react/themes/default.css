@@ -8,6 +8,17 @@
 
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+
+    text-decoration: none;
+    color: black;
+    border: 1px solid black;
+    background: silver;
+    padding: 4px;
+}
+
+.inline--sport {
+    background: gray;
 }
 
 .popup {
