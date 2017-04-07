@@ -1,3 +1,13 @@
+<a name="0.2.0"></a>
+# 0.2.0 (2017-04-07)
+
+
+### Features
+
+* **@aftonbladet/notify-react:** BREAKING CHANGE: Added inline support ([8a80a86](https://github.com/schibsted-martin/roc-notify/commit/8a80a86))
+
+
+
 <a name="0.1.1"></a>
 ## 0.1.1 (2017-04-06)
 
