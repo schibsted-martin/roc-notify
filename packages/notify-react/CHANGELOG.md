@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## 0.2.1 (2017-04-10)
+
+
+### Bug Fixes
+
+* **@aftonbladet/notify-react:** Removed CORS proxy ([1b20091](https://github.com/schibsted-martin/roc-notify/commit/1b20091))
+
+
+
 <a name="0.2.0"></a>
 # 0.2.0 (2017-04-07)
 
