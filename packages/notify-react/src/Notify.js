@@ -58,7 +58,7 @@ const fetchNotification = ({
     testSegment: segment,
     environment,
 }) => fetch( // eslint-disable-line no-undef
-    `https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, value => value)}`,
+    `//ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, value => value)}`,
     {
         method: 'GET',
     }
