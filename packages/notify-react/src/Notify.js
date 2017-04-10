@@ -58,7 +58,7 @@ const fetchNotification = ({
     testSegment: segment,
     environment,
 }) => fetch( // eslint-disable-line no-undef
-    `${canUseDOM ? 'https://crossorigin.me/' : ''}https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, value => value)}`,
+    `https://ab-web-notifications${environment !== 'production' ? `-${environment}` : ''}.herokuapp.com/crm/notifications${paramify({ exclude, userInfo, sid, bid, segment }, value => value)}`,
     {
         method: 'GET',
     }
