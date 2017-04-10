@@ -1,3 +1,13 @@
+<a name="0.2.2"></a>
+## 0.2.2 (2017-04-10)
+
+
+### Bug Fixes
+
+* **@aftonbladet/notify-react:** Automatically determin protocol for API ([aaa7972](https://github.com/schibsted-martin/roc-notify/commit/aaa7972))
+
+
+
 <a name="0.2.1"></a>
 ## 0.2.1 (2017-04-10)
 
