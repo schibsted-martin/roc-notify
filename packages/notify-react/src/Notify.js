@@ -1,26 +1,16 @@
 import React, { Component, PropTypes } from 'react';
-import { canUseDOM } from 'exenv';
 import 'whatwg-fetch';
 
-const localStorage = canUseDOM ? require('@aftonbladet/local-storage') : {};
+import { resolve, paramify, persistClosedNotifications, getPersistedClosedNotifications } from './utils';
 
-const resolve = (param) => {
-    if (typeof param === 'function') return param();
-
-    return param;
-};
-
-const paramify = (params, encoder = encodeURIComponent) => {
-    const query = Object.keys(params)
-        .map(key => (Array.isArray(params[key]) && params[key].length
-            ? params[key].map(value => `${encoder(key)}=${encoder(value)}`).join('&')
-            : `${encoder(key)}=${encoder(params[key])}`))
-        .join('&');
-
-    return query.length > 0
-        ? `?${query}`
-        : '';
-};
+const STATUS = {
+    INITIALIZED: 'initialized',
+    GOT_NOTIFICATION: 'fetched',
+    GOT_NOTHING: 'empty',
+    GOT_ERROR: 'error',
+    USER_CLICKED: 'clicked',
+    USER_CLOSED: 'closed',
+}
 
 const transformNotification = (data) => {
     if (data) {
@@ -70,35 +60,19 @@ const fetchNotification = ({
     throw new Error('Failed to load resource');
 });
 
-const persistClosedNotifications = (id) => {
-    if (id) {
-        if (canUseDOM) {
-            const excluded = localStorage.readValue('notify-exclude') || [];
-
-            if (!excluded.includes(id)) excluded.push(id);
-
-            localStorage.persistValue('notify-exclude', excluded);
-        }
-    }
-};
-
-const getPersistedClosedNotifications = () => {
-    if (canUseDOM) {
-        return localStorage.readValue('notify-exclude', 1000 * 60 * 60 * 24) || [];
-    }
-
-    return [];
-};
-
 class Notify extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { status: 'initialized' };
+        this.state = { status: STATUS.INITIALIZED };
     }
 
     componentDidMount() {
         this.fetchNotification();
+    }
+
+    componentDidUpdate() {
+        if (this.props.onLoad && this.state.status === STATUS.GOT_NOTIFICATION) this.props.onLoad(new Event('custom event'), this.state.data);
     }
 
     fetchNotification() {
@@ -121,34 +95,38 @@ class Notify extends Component {
             }
 
             this.setState({
-                status: data ? 'fetched' : 'empty',
+                status: data ? STATUS.GOT_NOTIFICATION : STATUS.GOT_NOTHING,
                 data: {
                     ...transformNotification(data),
                 },
             });
         })
-        .catch(error => console.log(error));
+        .catch((error) => {
+            this.setState({
+                status: STATUS.GOT_ERROR,
+            });
+        });
     }
 
     handleClick = (e) => {
-        if (this.props.onClick) this.props.onClick(e, this.state);
+        if (this.props.onClick) this.props.onClick(e, this.state.data);
 
-        persistClosedNotifications(this.state.data && this.state.data.id);
+        persistClosedNotifications(this.state.data);
 
         this.setState({
-            status: 'clicked',
+            status: STATUS.USER_CLICKED,
         });
     }
 
     handleClose = (e) => {
         e.preventDefault();
 
-        if (this.props.onClose) this.props.onClose(e, this.state);
+        if (this.props.onClose) this.props.onClose(e, this.state.data);
 
-        persistClosedNotifications(this.state.data && this.state.data.id);
+        persistClosedNotifications(this.state.data);
 
         this.setState({
-            status: 'closed',
+            status: STATUS.USER_CLOSED,
         });
     }
 
@@ -156,7 +134,7 @@ class Notify extends Component {
         const { type, theme } = this.props;
         const { status, data } = this.state;
 
-        if (status === 'fetched') {
+        if (status === STATUS.GOT_NOTIFICATION) {
             const { link, title, paragraph, image, variant } = data;
 
             if (type === 'inline') {
@@ -207,9 +185,10 @@ Notify.propTypes = {
         close: PropTypes.string,
     }).isRequired,
     user: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
-    siteCatalystId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-    burtId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-    testSegment: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    siteCatalystId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Could we remove this?
+    burtId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Could we remove this?
+    testSegment: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Could we remove this?
+    onLoad: PropTypes.func,
     onClick: PropTypes.func,
     onClose: PropTypes.func,
     environment: PropTypes.oneOf(['production', 'stage']),
@@ -222,6 +201,7 @@ Notify.defaultProps = {
     siteCatalystId: '',
     burtId: '',
     testSegment: '',
+    onLoad: undefined,
     onClick: undefined,
     onClose: undefined,
     environment: 'production',
