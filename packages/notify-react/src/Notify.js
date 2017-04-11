@@ -10,7 +10,7 @@ const STATUS = {
     GOT_ERROR: 'error',
     USER_CLICKED: 'clicked',
     USER_CLOSED: 'closed',
-}
+};
 
 const transformNotification = (data) => {
     if (data) {
@@ -72,7 +72,9 @@ class Notify extends Component {
     }
 
     componentDidUpdate() {
-        if (this.props.onLoad && this.state.status === STATUS.GOT_NOTIFICATION) this.props.onLoad(new Event('custom event'), this.state.data);
+        if (this.props.onLoad && this.state.status === STATUS.GOT_NOTIFICATION) {
+            this.props.onLoad(new Event(), this.state.data); // eslint-disable-line no-undef
+        }
     }
 
     fetchNotification() {
@@ -101,7 +103,7 @@ class Notify extends Component {
                 },
             });
         })
-        .catch((error) => {
+        .catch(() => {
             this.setState({
                 status: STATUS.GOT_ERROR,
             });
@@ -138,7 +140,6 @@ class Notify extends Component {
             const { link, title, paragraph, image, variant } = data;
 
             if (type === 'inline') {
-                // teaser?
                 return (
                     <a href={link.url} onClick={this.handleClick} className={[theme.inline, theme[`inline--${variant}`]].join(' ')}>
                         <h3 className={theme.title}>{title}</h3>
@@ -185,9 +186,9 @@ Notify.propTypes = {
         close: PropTypes.string,
     }).isRequired,
     user: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
-    siteCatalystId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Could we remove this?
-    burtId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Could we remove this?
-    testSegment: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Could we remove this?
+    siteCatalystId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Can we remove this?
+    burtId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Can we remove this?
+    testSegment: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // Can we remove this?
     onLoad: PropTypes.func,
     onClick: PropTypes.func,
     onClose: PropTypes.func,
