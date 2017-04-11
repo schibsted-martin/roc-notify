@@ -1,3 +1,13 @@
+<a name="0.2.3"></a>
+## 0.2.3 (2017-04-11)
+
+
+### Bug Fixes
+
+* **@aftonbladet/notify-react:** Added onLoad callback and refactoring ([ac83ca2](https://github.com/schibsted-martin/roc-notify/commit/ac83ca2))
+
+
+
 <a name="0.2.2"></a>
 ## 0.2.2 (2017-04-10)
 
